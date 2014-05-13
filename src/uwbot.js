@@ -11,23 +11,74 @@ function process (command, callback) {
    **/
 
   var args = command.split(" ");
-  var response;
   switch(args[1]) {
     case "weather":
       getWeather(function (data) {
         callback(data);
       });
       break;
+    case "exam":
+      if(args.length == 4) {
+        getExamSchedule(args[2], args[3], function (data) {
+          callback(data);
+        });
+      }
+      else {
+        callback(returnHelpString());
+      }
+      break;
     case "help":
       callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
         <b>UWBot commands:</b> <br> \
           <b>weather</b>: get the current weather in waterloo <br> \
+          <b>exam</b> (subject) (course_num): Gets exam info for given subject <br> \
+          <b>disclaimer</b>: Prints a boring disclaimer <br> \
           <b>help</b>: print this help command <br>");
       break;
+    case "disclaimer":
+      callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
+      break;
     default:
-      callback("Unrecognized Command!");
+      callback(returnHelpString());
       break;
   }
+}
+
+function returnHelpString() {
+  return "Unrecognized command, please refer to '@bot help' for accepted command.";
+}
+
+function getCurrentTerm(callback) {
+  var url = "/v2/terms/list.json" + "?key=" + key;
+  var parsedResponse;
+  sendReq(url, function (response) {
+    parsedResponse = JSON.parse(response);
+    callback(parsedResponse.data.current_term);
+  });
+}
+
+function getExamSchedule(subj, num, callback) {
+  var url = "/v2/courses/" + subj + "/" + num + "/examschedule.json" + "?key=" + key;
+  var responseStr;
+  var parsedResponse;
+  sendReq(url, function (response) {
+    parsedResponse = JSON.parse(response);
+    if(typeof parsedResponse.data.course !== "undefined") {
+      responseStr = "Exam Info for " + parsedResponse.data.course + ": <br>";
+      for(section in parsedResponse.data.sections) {
+        responseStr += "Section: " + parsedResponse.data.section.section + "<br> \
+        Date: " + parsedResponse.data.section.date + "<br> \
+        Start Time: " + parsedResponse.data.section.start_time + "<br> \
+        End Time: " + parsedResponse.data.section.end_time + "<br> \
+        Location: " + parsedResponse.data.section.location + "<br> \
+        ";
+      }
+    }
+    else {
+      responseStr = "Cannot get exam information for '" + subj + num + "'!";
+    }
+    callback(responseStr);
+  });
 }
 
 function getWeather(callback) {
