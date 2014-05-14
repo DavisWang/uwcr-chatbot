@@ -7,7 +7,10 @@ function process (command, callback) {
   /**
    * Commands accepted:
    * weather
+   * holiday
+   * exam
    * help
+   * disclaimer
    **/
 
   var args = command.split(" ");
@@ -61,22 +64,24 @@ function process (command, callback) {
 }
 
 function returnHelpString() {
-  return "Unrecognized command, please refer to '@bot help' for accepted command.";
+  return "Unrecognized command, please refer to '@bot help' for accepted commands.";
 }
 
 function getNextHoliday(callback) {
   var url = "/v2/events/holidays.json";
   sendReq(url, function (response) {
-    var holiday;
-    var date = new Date();
-    for (index in response.data) {
-      if(new Date(response.data[index].date) > date) {
-        holiday = response.data[index];
-        break;
+    if(response.meta.status == 200) {
+      var holiday;
+      var date = new Date();
+      for (index in response.data) {
+        if(new Date(response.data[index].date) > date) {
+          holiday = response.data[index];
+          break;
+        }
       }
-    }
-    if(typeof holiday !== "undefined") {
-      callback("The next holiday is " + holiday.name + " on " + holiday.date + ". Yay!");
+      if(typeof holiday !== "undefined") {
+        callback("The next holiday is " + holiday.name + " on " + holiday.date + ". Yay!");
+      }
     }
     else {
       callback("Cannot find the next holiday, maybe there is none... :(");
@@ -87,7 +92,9 @@ function getNextHoliday(callback) {
 function getCurrentTerm(callback) {
   var url = "/v2/terms/list.json" + "?key=" + key;
   sendReq(url, function (response) {
-    callback(response.data.current_term);
+    if(response.meta.status == 200) {
+      callback(response.data.current_term);
+    }
   });
 }
 
@@ -95,7 +102,7 @@ function getExamSchedule(subj, num, callback) {
   var url = "/v2/courses/" + subj + "/" + num + "/examschedule.json" + "?key=" + key;
   var responseStr;
   sendReq(url, function (response) {
-    if(typeof response.data.course !== "undefined") {
+    if(response.meta.status == 200 && typeof response.data.course !== "undefined") {
       responseStr = "Exam Info for " + response.data.course + ": <br>";
       for(section in response.data.sections) {
         responseStr += "Section: " + response.data.section.section + "<br> \
@@ -107,7 +114,7 @@ function getExamSchedule(subj, num, callback) {
       }
     }
     else {
-      responseStr = "Cannot get exam information for '" + subj + num + "'!";
+      responseStr = "Cannot find exam information for '" + subj + num + "'! Exam schedule is not up or no exams for this course ;)";
     }
     callback(responseStr);
   });
@@ -117,8 +124,14 @@ function getWeather(callback) {
   var url = "/v2/weather/current.json";
   var responseStr;
   sendReq(url, function (response) {
-    responseStr = "The current temperature in Waterloo is: " + response.data.temperature_current_c + " Celsius";
-    callback(responseStr);
+    if(response.meta.status == 200) {
+      responseStr = "The current temperature in Waterloo is: " + response.data.temperature_current_c + " Celsius";
+      callback(responseStr);
+    }
+    else {
+      callback("Cannot get weather info for Waterloo...");
+    }
+
   });
 }
 
