@@ -12,54 +12,71 @@ function process (command, callback) {
    * help
    * disclaimer
    **/
+  try {
+    var i = command.indexOf(" ");
+    var args;
+    var str;
+    if(i == -1) {
+      args = str = "";
+    }
+    else {
+      // space delimited args
+      args = command.split(" ");
 
-  var args = command.split(" ");
-  switch(args[1]) {
-    case "weather":
-      if(args.length == 2) {
-        getWeather(function (data) {
-          callback(data);
-        });
-      }
-      else {
+      // the entire string after the '@botname ', is empty string unless '@botname ' is followed by one or more chars
+      str = i == -1 ? "" : command.substr(i + 1);
+    }
+
+    switch(args[1]) {
+      case "weather":
+        if(args.length == 2) {
+          getWeather(function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
+      case "holiday":
+        if(args.length == 2) {
+          getNextHoliday(function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
+      case "exam":
+        if(args.length == 4) {
+          getExamSchedule(args[2], args[3], function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
+      case undefined:
+      case "help":
+        callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
+          <b>UWBot commands:</b> <br> \
+            <b>weather</b>: get the current weather in waterloo <br> \
+            <b>exam</b> (subject) (course_num): Gets exam info for given subject <br> \
+            <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>disclaimer</b>: Prints a boring disclaimer <br> \
+            <b>help</b>: print this help command <br>");
+        break;
+      case "disclaimer":
+        callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
+        break;
+      default:
         callback(returnHelpString());
-      }
-      break;
-    case "holiday":
-      if(args.length == 2) {
-        getNextHoliday(function (data) {
-          callback(data);
-        });
-      }
-      else {
-        callback(returnHelpString());
-      }
-      break;
-    case "exam":
-      if(args.length == 4) {
-        getExamSchedule(args[2], args[3], function (data) {
-          callback(data);
-        });
-      }
-      else {
-        callback(returnHelpString());
-      }
-      break;
-    case "help":
-      callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
-        <b>UWBot commands:</b> <br> \
-          <b>weather</b>: get the current weather in waterloo <br> \
-          <b>exam</b> (subject) (course_num): Gets exam info for given subject <br> \
-          <b>holiday</b>: Get the date of the next holiday! <br> \
-          <b>disclaimer</b>: Prints a boring disclaimer <br> \
-          <b>help</b>: print this help command <br>");
-      break;
-    case "disclaimer":
-      callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
-      break;
-    default:
-      callback(returnHelpString());
-      break;
+        break;
+    }
+  } catch (err) {
+    callback("Uh-oh! Something has gone wrong! Please try again later!");
   }
 }
 
