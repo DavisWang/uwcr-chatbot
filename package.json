@@ -1,0 +1,30 @@
+{
+  "name": "uwcr-chatbot",
+  "version": "1.0.0",
+  "description": "A chatbot for UWCR",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DavisWang/uwcr-chatbot.git"
+  },
+  "keywords": [
+    "chat",
+    "bot",
+    "chatbot",
+    "uwcr",
+    "uw",
+    "uwaterloo"
+  ],
+  "author": "Davis Wang <davis@daviswang.com> (http://daviswang.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DavisWang/uwcr-chatbot/issues"
+  },
+  "homepage": "https://github.com/DavisWang/uwcr-chatbot"
+}
