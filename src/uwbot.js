@@ -102,7 +102,8 @@ function getNumberTrivia(number, callback) {
         found = true;
         callback(response.text);
       }
-      else if (!found && !response.found && str === "trivia") {
+      //if we're at the last element and still haven't found anything
+      else if (!found && !response.found && str === "math") {
         callback("Cannot find a factoid about " + parseInt(number));
       }
     });
