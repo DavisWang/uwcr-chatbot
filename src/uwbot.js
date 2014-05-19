@@ -173,7 +173,7 @@ function getWeather(callback) {
   var url = "/v2/weather/current.json";
   var responseStr;
   sendReq(baseUrl, url, function (response) {
-    if(response.meta.status == 200) {
+    if(response.meta.status == 200 && response.data.temperature_current_c != null) {
       responseStr = "The current temperature in Waterloo is: " + response.data.temperature_current_c + " Celsius";
       callback(responseStr);
     }
