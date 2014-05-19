@@ -64,14 +64,20 @@ function process (command, callback) {
             callback(data);
           })
         }
-      break;
+        break;
+      case "infoses":
+        getInfoSession(args[2], function (data) {
+          callback(data);
+        })
+        break;
       case undefined:
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
-            <b>weather</b>: get the current weather in waterloo <br> \
-            <b>exam</b> (subject) (course_num): Gets exam info for given subject <br> \
+            <b>weather</b>: Get the current weather in waterloo <br> \
+            <b>exam</b> (subject) (course_num): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>infoses</b> ('today'/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>disclaimer</b>: Prints a boring disclaimer <br> \
             <b>help</b>: print this help command <br>");
         break;
@@ -174,7 +180,106 @@ function getWeather(callback) {
     else {
       callback("Cannot get weather info for Waterloo...");
     }
+  });
+}
 
+function convertMonth(data) {
+  if (data == "January") {
+    data = 1;
+  } else if (data == "February") {
+    data = 2;
+  } else if (data == "March") {
+    data = 3;
+  } else if (data == "April") {
+    data = 4;
+  } else if (data == "May") {
+    data = 5;
+  } else if (data == "June") {
+    data = 6;
+  } else if (data == "July") {
+    data = 7;
+  } else if (data == "August") {
+    data = 8;
+  } else if (data == "September") {
+    data = 9;
+  } else if (data == "October") {
+    data = 10;
+  } else if (data == "November") {
+    data = 11;
+  } else if (data == "December") {
+    data = 12;
+  }
+  return data;
+}
+
+function getInfoSession(option, callback) {
+  var url = "/v2/resources/infosessions.json" + "?key=" + key;
+  sendReq(baseUrl, url, function (response) {
+    if (response.meta.status == 200) {
+      option = option.trim(); //deletes white space and trims user input
+      if (option == "") option = "today";
+      if (typeof option === "undefined" || option == "today") { //get today's info sessions
+        //get today's date
+        var today = new Date();
+        var date = today.getDate();
+        var month = today.getMonth() + 1; //January is 0!
+        
+        //record relevant responses into results
+        var results = [];
+        for (var i = 0; i < response.data.length; i++) {
+          //parse response's date field
+          var response_data = response.data[i].date;
+          var index = response_data.indexOf(",");
+          response_data = response_data.substr(0,index);
+          var response_month = convertMonth(response_data.split(" ")[0]);
+          var response_date = response_data.split(" ")[1];
+          if (response_month == month) {
+            if (response_date == date) {
+              results.push(i);
+            } else if (response_date > date) {
+              break;
+            }
+          }
+        }
+        
+        //process results
+        if (results.length == 0) {
+          responseStr = "There are no info sessions today!";
+          callback(responseStr);
+        } else {
+          var responseStr = "Today's info session(s):\n";
+          for (var i = 0; i < results.length; i++) {
+            responseStr += response.data[i].employer + " - " + response.data[i].date + " from " + response.data[i].start_time 
+              + " to " + response.data[i].end_time + " at " + response.data[i].location + "\n";
+          }
+          callback(responseStr);
+        }
+      } else {  //get the specified company's info sessions
+        //record relevant responses into results
+        var results = [];
+        var lowercase_option = option.toLowerCase();  //compare user's input and the response using lowercase letters
+        for (var i = 0; i < response.data.length; i++) {
+          if (lowercase_option == response.data[i].employer.toLowerCase()) {
+            results.push(i);
+          }
+        }
+        
+        //process results
+        if (results.length == 0) {
+          responseStr = "There are no info sessions for " + option + "!";
+          callback(responseStr);
+        } else {
+          var responseStr = option + "'s info session(s):\n";
+          for (var i = 0; i < results.length; i++) {
+            responseStr += response.data[i].date + " from " + response.data[i].start_time 
+              + " to " + response.data[i].end_time + " at " + response.data[i].location + "\n";
+          }
+          callback(responseStr);
+        }
+      }
+    } else {
+      callback("Info Session data is not available at the moment...");
+    }
   });
 }
 
