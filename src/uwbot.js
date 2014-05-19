@@ -58,6 +58,13 @@ function process (command, callback) {
           callback(returnHelpString());
         }
         break;
+      case "number":
+        if(args.length == 3 && parseInt(args[2]) == args[2]) {
+          getNumberTrivia(args[2], function (data) {
+            callback(data);
+          })
+        }
+      break;
       case undefined:
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
@@ -76,6 +83,7 @@ function process (command, callback) {
         break;
     }
   } catch (err) {
+    console.log("UWBot has encountered an error: " + err);
     callback("Uh-oh! Something has gone wrong! Please try again later!");
   }
 }
@@ -84,9 +92,26 @@ function returnHelpString() {
   return "Unrecognized command, please refer to '@bot help' for accepted commands.";
 }
 
+function getNumberTrivia(number, callback) {
+  var found = false;
+  ["trivia", "year", "math"].map(function (str) {
+    var url = "/" + parseInt(number) + "/" + str;
+    //override baseUrl value
+    sendReq("numbersapi.com", url, function (response) {
+      if(!found && response.found) {
+        found = true;
+        callback(response.text);
+      }
+      else if (!found && !response.found && str === "trivia") {
+        callback("Cannot find a factoid about " + parseInt(number));
+      }
+    });
+  });
+}
+
 function getNextHoliday(callback) {
   var url = "/v2/events/holidays.json";
-  sendReq(url, function (response) {
+  sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200) {
       var holiday;
       var date = new Date();
@@ -108,7 +133,7 @@ function getNextHoliday(callback) {
 
 function getCurrentTerm(callback) {
   var url = "/v2/terms/list.json" + "?key=" + key;
-  sendReq(url, function (response) {
+  sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200) {
       callback(response.data.current_term);
     }
@@ -118,7 +143,7 @@ function getCurrentTerm(callback) {
 function getExamSchedule(subj, num, callback) {
   var url = "/v2/courses/" + subj + "/" + num + "/examschedule.json" + "?key=" + key;
   var responseStr;
-  sendReq(url, function (response) {
+  sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200 && typeof response.data.course !== "undefined") {
       responseStr = "Exam Info for " + response.data.course + ": <br>";
       for(section in response.data.sections) {
@@ -140,7 +165,7 @@ function getExamSchedule(subj, num, callback) {
 function getWeather(callback) {
   var url = "/v2/weather/current.json";
   var responseStr;
-  sendReq(url, function (response) {
+  sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200) {
       responseStr = "The current temperature in Waterloo is: " + response.data.temperature_current_c + " Celsius";
       callback(responseStr);
@@ -152,7 +177,7 @@ function getWeather(callback) {
   });
 }
 
-function sendReq(url, callback) {
+function sendReq(baseUrl, url, callback) {
   var options = {
     host: baseUrl,
     port: 80,
