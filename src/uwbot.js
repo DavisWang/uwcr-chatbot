@@ -217,8 +217,7 @@ function getInfoSession(option, callback) {
   sendReq(baseUrl, url, function (response) {
     if (response.meta.status == 200) {
       option = option.trim(); //deletes white space and trims user input
-      if (option == "") option = "today";
-      if (typeof option === "undefined" || option == "today") { //get today's info sessions
+      if (typeof option === "undefined" || option == "today" || option == "") { //get today's info sessions
         //get today's date
         var today = new Date();
         var date = today.getDate();
@@ -244,13 +243,13 @@ function getInfoSession(option, callback) {
         
         //process results
         if (results.length == 0) {
-          responseStr = "There are no info sessions today!";
+          var responseStr = "There are no info sessions today!";
           callback(responseStr);
         } else {
           var responseStr = "Today's info session(s):\n";
           for (var i = 0; i < results.length; i++) {
-            responseStr += response.data[i].employer + " - " + response.data[i].date + " from " + response.data[i].start_time 
-              + " to " + response.data[i].end_time + " at " + response.data[i].location + "\n";
+            responseStr += response.data[results[i]].employer + " - " + response.data[results[i]].date + " from " + response.data[results[i]].start_time 
+              + " to " + response.data[results[i]].end_time + " at " + response.data[results[i]].location + "\n";
           }
           callback(responseStr);
         }
@@ -259,20 +258,20 @@ function getInfoSession(option, callback) {
         var results = [];
         var lowercase_option = option.toLowerCase();  //compare user's input and the response using lowercase letters
         for (var i = 0; i < response.data.length; i++) {
-          if (lowercase_option == response.data[i].employer.toLowerCase()) {
+          if (response.data[i].employer.toLowerCase().indexOf(lowercase_option) != -1) {
             results.push(i);
           }
         }
         
         //process results
         if (results.length == 0) {
-          responseStr = "There are no info sessions for " + option + "!";
+          var responseStr = "There are no info sessions for " + option + "!";
           callback(responseStr);
         } else {
-          var responseStr = option + "'s info session(s):\n";
+          var responseStr = "";
           for (var i = 0; i < results.length; i++) {
-            responseStr += response.data[i].date + " from " + response.data[i].start_time 
-              + " to " + response.data[i].end_time + " at " + response.data[i].location + "\n";
+            responseStr += response.data[results[i]].employer + " - " + response.data[results[i]].date + " from " + response.data[results[i]].start_time 
+              + " to " + response.data[results[i]].end_time + " at " + response.data[results[i]].location + "\n";
           }
           callback(responseStr);
         }
