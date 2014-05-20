@@ -183,35 +183,6 @@ function getWeather(callback) {
   });
 }
 
-function convertMonth(data) {
-  if (data == "January") {
-    data = 1;
-  } else if (data == "February") {
-    data = 2;
-  } else if (data == "March") {
-    data = 3;
-  } else if (data == "April") {
-    data = 4;
-  } else if (data == "May") {
-    data = 5;
-  } else if (data == "June") {
-    data = 6;
-  } else if (data == "July") {
-    data = 7;
-  } else if (data == "August") {
-    data = 8;
-  } else if (data == "September") {
-    data = 9;
-  } else if (data == "October") {
-    data = 10;
-  } else if (data == "November") {
-    data = 11;
-  } else if (data == "December") {
-    data = 12;
-  }
-  return data;
-}
-
 function getInfoSession(option, callback) {
   var url = "/v2/resources/infosessions.json" + "?key=" + key;
   sendReq(baseUrl, url, function (response) {
@@ -227,11 +198,9 @@ function getInfoSession(option, callback) {
         var results = [];
         for (var i = 0; i < response.data.length; i++) {
           //parse response's date field
-          var response_data = response.data[i].date;
-          var index = response_data.indexOf(",");
-          response_data = response_data.substr(0,index);
-          var response_month = convertMonth(response_data.split(" ")[0]);
-          var response_date = response_data.split(" ")[1];
+          var response_data = new Date(response.data[i].date);
+          var response_date = response_data.getDate();
+          var response_month = response_data.getMonth() + 1;
           if (response_month == month) {
             if (response_date == date) {
               results.push(i);
@@ -243,10 +212,10 @@ function getInfoSession(option, callback) {
         
         //process results
         if (results.length == 0) {
-          var responseStr = "There are no info sessions today!";
+          var responseStr = "There are no employer's info sessions today.";
           callback(responseStr);
         } else {
-          var responseStr = "Today's info session(s):\n";
+          var responseStr = "Today's employer's info session(s):\n";
           for (var i = 0; i < results.length; i++) {
             responseStr += response.data[results[i]].employer + " - " + response.data[results[i]].date + " from " + response.data[results[i]].start_time 
               + " to " + response.data[results[i]].end_time + " at " + response.data[results[i]].location + "\n";
@@ -257,15 +226,17 @@ function getInfoSession(option, callback) {
         //record relevant responses into results
         var results = [];
         var lowercase_option = option.toLowerCase();  //compare user's input and the response using lowercase letters
+        var now = new Date(); //get current time
+        now.setDate(now.getDate() - 1); //take today into account so today's info sessions would be shown
         for (var i = 0; i < response.data.length; i++) {
-          if (response.data[i].employer.toLowerCase().indexOf(lowercase_option) != -1) {
+          if (response.data[i].employer.toLowerCase().indexOf(lowercase_option) != -1 && new Date(response.data[i].date) > now) {
             results.push(i);
           }
         }
         
         //process results
         if (results.length == 0) {
-          var responseStr = "There are no info sessions for " + option + "!";
+          var responseStr = "There are no upcoming employer's info sessions for " + option + ".";
           callback(responseStr);
         } else {
           var responseStr = "";
