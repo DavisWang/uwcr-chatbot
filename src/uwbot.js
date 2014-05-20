@@ -75,9 +75,10 @@ function process (command, callback) {
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
             <b>weather</b>: Get the current weather in waterloo <br> \
-            <b>exam</b> (subject) (course_num): Get the exam info for a given subject <br> \
+            <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> ('today'/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
+            <b>number</b> (number): Gets an 'interesting' fact about the given number.
             <b>disclaimer</b>: Prints a boring disclaimer <br> \
             <b>help</b>: print this help command <br>");
         break;
@@ -100,16 +101,20 @@ function returnHelpString() {
 
 function getNumberTrivia(number, callback) {
   var found = false;
-  ["trivia", "year", "math"].map(function (str) {
+  var lst = ["trivia", "year", "math"];
+  var count = 0; //the number of lst elements we've processed
+  lst.map(function (str) {
     var url = "/" + parseInt(number) + "/" + str;
     //override baseUrl value
     sendReq("numbersapi.com", url, function (response) {
+      console.log("we're at " +str);
+      count++;
       if(!found && response.found) {
         found = true;
         callback(response.text);
       }
       //if we're at the last element and still haven't found anything
-      else if (!found && !response.found && str === "math") {
+      else if (!found && !response.found && count === lst.length) {
         callback("Cannot find a factoid about " + parseInt(number));
       }
     });
