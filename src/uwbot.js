@@ -64,14 +64,20 @@ function process (command, callback) {
             callback(data);
           })
         }
-      break;
+        break;
+      case "infoses":
+        getInfoSession(args[2], function (data) {
+          callback(data);
+        })
+        break;
       case undefined:
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
-            <b>weather</b>: get the current weather in waterloo <br> \
-            <b>exam</b> (subject) (course_num): Gets exam info for given subject <br> \
+            <b>weather</b>: Get the current weather in waterloo <br> \
+            <b>exam</b> (subject) (course_num): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>infoses</b> ('today'/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>disclaimer</b>: Prints a boring disclaimer <br> \
             <b>help</b>: print this help command <br>");
         break;
@@ -174,7 +180,76 @@ function getWeather(callback) {
     else {
       callback("Cannot get weather info for Waterloo...");
     }
+  });
+}
 
+function getInfoSession(option, callback) {
+  var url = "/v2/resources/infosessions.json" + "?key=" + key;
+  sendReq(baseUrl, url, function (response) {
+    if (response.meta.status == 200) {
+      option = option.trim(); //deletes white space and trims user input
+      if (typeof option === "undefined" || option == "today" || option == "") { //get today's info sessions
+        //get today's date
+        var today = new Date();
+        var date = today.getDate();
+        var month = today.getMonth() + 1; //January is 0!
+        
+        //record relevant responses into results
+        var results = [];
+        for (var i = 0; i < response.data.length; i++) {
+          //parse response's date field
+          var response_data = new Date(response.data[i].date);
+          var response_date = response_data.getDate();
+          var response_month = response_data.getMonth() + 1;
+          if (response_month == month) {
+            if (response_date == date) {
+              results.push(i);
+            } else if (response_date > date) {
+              break;
+            }
+          }
+        }
+        
+        //process results
+        if (results.length == 0) {
+          var responseStr = "There are no employer's info sessions today.";
+          callback(responseStr);
+        } else {
+          var responseStr = "Today's employer's info session(s):\n";
+          for (var i = 0; i < results.length; i++) {
+            responseStr += response.data[results[i]].employer + " - " + response.data[results[i]].date + " from " + response.data[results[i]].start_time 
+              + " to " + response.data[results[i]].end_time + " at " + response.data[results[i]].location + "\n";
+          }
+          callback(responseStr);
+        }
+      } else {  //get the specified company's info sessions
+        //record relevant responses into results
+        var results = [];
+        var lowercase_option = option.toLowerCase();  //compare user's input and the response using lowercase letters
+        var now = new Date(); //get current time
+        now.setDate(now.getDate() - 1); //take today into account so today's info sessions would be shown
+        for (var i = 0; i < response.data.length; i++) {
+          if (response.data[i].employer.toLowerCase().indexOf(lowercase_option) != -1 && new Date(response.data[i].date) > now) {
+            results.push(i);
+          }
+        }
+        
+        //process results
+        if (results.length == 0) {
+          var responseStr = "There are no upcoming employer's info sessions for " + option + ".";
+          callback(responseStr);
+        } else {
+          var responseStr = "";
+          for (var i = 0; i < results.length; i++) {
+            responseStr += response.data[results[i]].employer + " - " + response.data[results[i]].date + " from " + response.data[results[i]].start_time 
+              + " to " + response.data[results[i]].end_time + " at " + response.data[results[i]].location + "\n";
+          }
+          callback(responseStr);
+        }
+      }
+    } else {
+      callback("Info Session data is not available at the moment...");
+    }
   });
 }
 
