@@ -78,7 +78,7 @@ function process (command, callback) {
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> ('today'/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
-            <b>number</b> (number): Gets an 'interesting' fact about the given number.
+            <b>number</b> (number): Gets an 'interesting' fact about the given number. <br> \
             <b>disclaimer</b>: Prints a boring disclaimer <br> \
             <b>help</b>: print this help command <br>");
         break;
