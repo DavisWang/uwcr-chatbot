@@ -191,7 +191,7 @@ function getInfoSession(option, callback) {
   var url = "/v2/resources/infosessions.json" + "?key=" + key;
   sendReq(baseUrl, url, function (response) {
     if (response.meta.status == 200) {
-      option = option.trim(); //deletes white space and trims user input
+      if (typeof option !== "undefined") option = option.trim(); //deletes white space and trims user input
       if (typeof option === "undefined" || option == "today" || option == "") { //get today's info sessions
         //get today's date
         var today = new Date();
@@ -240,7 +240,7 @@ function getInfoSession(option, callback) {
         
         //process results
         if (results.length == 0) {
-          var responseStr = "There are no upcoming employer's info sessions for " + option + ".";
+          var responseStr = "There are no upcoming employer's info sessions for company " + option + ".";
           callback(responseStr);
         } else {
           var responseStr = "";
