@@ -191,7 +191,9 @@ function getInfoSession(option, callback) {
   var url = "/v2/resources/infosessions.json" + "?key=" + key;
   sendReq(baseUrl, url, function (response) {
     if (response.meta.status == 200) {
-      if (typeof option !== "undefined") option = option.trim(); //deletes white space and trims user input
+      if (typeof option !== "undefined") {
+        option = option.trim(); //deletes white space and trims user input
+      }
       if (typeof option === "undefined" || option == "today" || option == "") { //get today's info sessions
         //get today's date
         var today = new Date();
