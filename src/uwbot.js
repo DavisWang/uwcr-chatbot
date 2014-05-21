@@ -77,7 +77,7 @@ function process (command, callback) {
             <b>weather</b>: Get the current weather in waterloo <br> \
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
-            <b>infoses</b> ('today'/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
+            <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>number</b> (number): Gets an 'interesting' fact about the given number. <br> \
             <b>disclaimer</b>: Prints a boring disclaimer <br> \
             <b>help</b>: print this help command <br>");
@@ -240,10 +240,10 @@ function getInfoSession(option, callback) {
         
         //process results
         if (results.length == 0) {
-          var responseStr = "There are no upcoming employer's info sessions for company " + option + ".";
+          var responseStr = "There are no upcoming employer's info sessions for company \"" + option + "\".";
           callback(responseStr);
         } else {
-          var responseStr = "";
+          var responseStr = "The upcoming employer's info sessions for company name containing \"" + option + "\" are:\n";
           for (var i = 0; i < results.length; i++) {
             responseStr += response.data[results[i]].employer + " - " + response.data[results[i]].date + " from " + response.data[results[i]].start_time 
               + " to " + response.data[results[i]].end_time + " at " + response.data[results[i]].location + "\n";
