@@ -107,7 +107,6 @@ function getNumberTrivia(number, callback) {
     var url = "/" + parseInt(number) + "/" + str;
     //override baseUrl value
     sendReq("numbersapi.com", url, function (response) {
-      console.log("we're at " +str);
       count++;
       if(!found && response.found) {
         found = true;
