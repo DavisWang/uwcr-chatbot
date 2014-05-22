@@ -58,11 +58,17 @@ function process (command, callback) {
           callback(returnHelpString());
         }
         break;
-	  case "newsMe":
-	      getNews(function (data) {
-			callback(data);
+	  case "news":
+	    if (args.length == 2){
+		  getNews(function (data) {
+	        callback(data);
 		  });
 		  break;
+		}
+		else{
+		  callback(returnHelpString());
+		}
+		break;
       case undefined:
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
