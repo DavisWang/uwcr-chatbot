@@ -70,6 +70,16 @@ function process (command, callback) {
           callback(data);
         })
         break;
+      case "courseinfo":
+        if(args.length == 4) {
+          getCourseInfo(args[2], args[3], function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
       case undefined:
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
@@ -78,6 +88,7 @@ function process (command, callback) {
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
+            <b>courseinfo</b> (subject) (course_number): brief description of the course, prereq, antireq <br> \
             <b>number</b> (number): Gets an 'interesting' fact about the given number. <br> \
             <b>disclaimer</b>: Prints a boring disclaimer <br> \
             <b>help</b>: print this help command <br>");
@@ -255,6 +266,28 @@ function getInfoSession(option, callback) {
       }
     } else {
       callback("Info Session data is not available at the moment...");
+    }
+  });
+}
+
+function getCourseInfo(subject, num, callback) {
+  var url = "/v2/courses/" + subject + "/" + num + ".json" + "?key=" + key;
+  var responseStr;
+  var termsOfferedStr = "";
+  sendReq(baseUrl, url, function (response) {
+    if(response.meta.status == 200) {
+      for (var i = 0; i < response.data.terms_offered.length; i++) {
+        termsOfferedStr += response.data.terms_offered[i] + " ";
+      }
+      responseStr = "<b>" + response.data.title + "</b> \n"
+                 +  response.data.description + "\n" 
+                 +  "prereqs: " + response.data.prerequisites + "\n"
+                 +  "antireqs: " + response.data.antirequisites + "\n"
+                 +  "terms offered: " + termsOfferedStr;
+      callback(responseStr);
+    }
+    else {
+      callback("Cannot find course info for " + subject + num + ", please make sure both the subject and course number are correct");
     }
   });
 }
