@@ -275,18 +275,19 @@ function getCourseInfo(subject, num, callback) {
   var responseStr;
   var termsOfferedStr = "";
   sendReq(baseUrl, url, function (response) {
-    if(response.meta.status == 200 && typeof response.data.title !== "undefined") {
+    if(response.meta.status == 200) {
       for (var i = 0; i < response.data.terms_offered.length; i++) {
         termsOfferedStr += response.data.terms_offered[i] + " ";
       }
       responseStr = "<b>" + response.data.title + "</b> \n"
                  +  response.data.description + "\n" 
                  +  "prereqs: " + response.data.prerequisites + "\n"
+                 +  "antireqs: " + response.data.antirequisites + "\n"
                  +  "terms offered: " + termsOfferedStr;
       callback(responseStr);
     }
     else {
-      callback("Cannot find course info for " + subject + num + ", please make sure the course number is correct");
+      callback("Cannot find course info for " + subject + num + ", please make sure both the subject and course number are correct");
     }
   });
 }
