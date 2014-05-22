@@ -58,6 +58,11 @@ function process (command, callback) {
           callback(returnHelpString());
         }
         break;
+	  case "newsMe":
+	      getNews(function (data) {
+			callback(data);
+		  });
+		  break;
       case undefined:
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
@@ -150,6 +155,28 @@ function getWeather(callback) {
     }
 
   });
+}
+
+function getNews(callback) {
+  var url = "/v2/news.json" + "?key=" + key;
+  var responseStr;
+  sendReq(url, function (response) {
+    if(response.meta.status == 200) {
+      responseStr = "Top 5 News"+"<br>";
+	  for (var i=0;i<3;i++){
+		responseStr+="Title:"+response.data[i].title + "<br> \
+		Site:"+response.data[i].site + "<br> \
+		Last Update:"+response.data[i].updated + "<br> \
+		Link:" + "<a href=\""+response.data[i].link+"\">Click Here"+"</a>"+ "<br>";
+		responseStr+="<br>";
+	  }
+    }
+    else {
+      responseStr = "Cannot find exam information for '" + subj + num + "'! Exam schedule is not up or no exams for this course ;)";
+    }
+    callback(responseStr);
+  });
+  
 }
 
 function sendReq(url, callback) {
