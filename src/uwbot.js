@@ -72,13 +72,13 @@ function process (command, callback) {
         break;
       case "courseinfo":
         if(args.length == 4) {
-          getCourseInfo(args[2], args[3], function (data) {   //
+          getCourseInfo(args[2], args[3], function (data) { 
             callback(data);
           });
         }
       case "tutors":
         if(args.length == 4) {
-          getTutors(args[2], args[3], function (data) {   //
+          getTutors(args[2], args[3], function (data) { 
             callback(data);
           });
         }
@@ -278,7 +278,7 @@ function getInfoSession(option, callback) {
 }
 
 function getCourseInfo(subject, num, callback) {
-  var url = "/v2/courses/" + subject + "/" + num + ".json" + "?key=" + key;
+  var url = "/cs/courses/" + subject + "/" + num + ".json" + "?key=" + key;
   var responseStr;
   var termsOfferedStr = "";
   sendReq(baseUrl, url, function (response) {
