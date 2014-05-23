@@ -109,7 +109,7 @@ function process (command, callback) {
 }
 
 function returnHelpString() {
-  return "Unrecognized command, please refer to '@bot help' for accepted commands.";
+  return "Unrecognized/improperly used command, please refer to '@bot help' for accepted commands and how to use them.";
 }
 
 function getNumberTrivia(number, callback) {
