@@ -66,9 +66,11 @@ function process (command, callback) {
         }
         break;
       case "infoses":
-        getInfoSession(args[2], function (data) {
+        var index = str.indexOf(" ");
+        var arg = (index == -1) ? "" : str.substr(index + 1);
+        getInfoSession(arg, function (data) {
           callback(data);
-        })
+        });
         break;
       case "courseinfo":
         if(args.length == 4) {
@@ -84,14 +86,14 @@ function process (command, callback) {
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
-            <b>weather</b>: Get the current weather in waterloo <br> \
+            <b>weather</b>: Get the current weather in Waterloo <br> \
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
-            <b>courseinfo</b> (subject) (course_number): brief description of the course, prereq, antireq <br> \
-            <b>number</b> (number): Gets an 'interesting' fact about the given number. <br> \
-            <b>disclaimer</b>: Prints a boring disclaimer <br> \
-            <b>help</b>: print this help command <br>");
+            <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
+            <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+            <b>disclaimer</b>: Print a boring disclaimer <br> \
+            <b>help</b>: Print this help command <br>");
         break;
       case "disclaimer":
         callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
