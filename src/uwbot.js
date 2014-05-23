@@ -66,9 +66,11 @@ function process (command, callback) {
         }
         break;
       case "infoses":
-        getInfoSession(args[2], function (data) {
+        var index = str.indexOf(" ");
+        var arg = (index == -1) ? "" : str.substr(index + 1);
+        getInfoSession(arg, function (data) {
           callback(data);
-        })
+        });
         break;
       case "courseinfo":
         if(args.length == 4) {
@@ -90,14 +92,14 @@ function process (command, callback) {
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
-            <b>weather</b>: Get the current weather in waterloo <br> \
+            <b>weather</b>: Get the current weather in Waterloo <br> \
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
-            <b>courseinfo</b> (subject) (course_number): brief description of the course, prereq, antireq <br> \
-            <b>number</b> (number): Gets an 'interesting' fact about the given number. <br> \
-            <b>disclaimer</b>: Prints a boring disclaimer <br> \
-            <b>help</b>: print this help command <br>");
+            <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
+            <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+            <b>disclaimer</b>: Print a boring disclaimer <br> \
+            <b>help</b>: Print this help command <br>");
         break;
       case "disclaimer":
         callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
@@ -113,7 +115,7 @@ function process (command, callback) {
 }
 
 function returnHelpString() {
-  return "Unrecognized command, please refer to '@bot help' for accepted commands.";
+  return "Unrecognized/improperly used command, please refer to '@bot help' for accepted commands and how to use them.";
 }
 
 function getNumberTrivia(number, callback) {
@@ -281,16 +283,21 @@ function getCourseInfo(subject, num, callback) {
   var url = "/cs/courses/" + subject + "/" + num + ".json" + "?key=" + key;
   var responseStr;
   var termsOfferedStr = "";
+  var descriptionStr, prereqStr, antireqStr;
   sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200) {
       for (var i = 0; i < response.data.terms_offered.length; i++) {
         termsOfferedStr += response.data.terms_offered[i] + " ";
       }
+      prereqStr = (response.data.prerequisites !== null) ? response.data.prerequisites : "None";
+      antireqStr = (response.data.antirequisites !== null) ? response.data.antirequisites : "None";
+      descriptionStr = (response.data.description !== null) ? response.data.description : "No description available for " + subject + num;
+      termsOfferedStr = (termsOfferedStr !== "") ? termsOfferedStr : "None";
       responseStr = "<b>" + response.data.title + "</b> \n"
-                 +  response.data.description + "\n" 
-                 +  "prereqs: " + response.data.prerequisites + "\n"
-                 +  "antireqs: " + response.data.antirequisites + "\n"
-                 +  "terms offered: " + termsOfferedStr;
+                  + descriptionStr + "\n" 
+                  + "Prereqs: " + prereqStr + "\n"
+                  + "Antireqs: " + antireqStr + "\n"
+                  + "Terms offered: " + termsOfferedStr;
       callback(responseStr);
     }
     else {
