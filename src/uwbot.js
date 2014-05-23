@@ -72,7 +72,13 @@ function process (command, callback) {
         break;
       case "courseinfo":
         if(args.length == 4) {
-          getCourseInfo(args[2], args[3], function (data) {
+          getCourseInfo(args[2], args[3], function (data) {   //
+            callback(data);
+          });
+        }
+      case "tutors":
+        if(args.length == 4) {
+          getTutors(args[2], args[3], function (data) {   //
             callback(data);
           });
         }
@@ -198,6 +204,7 @@ function getWeather(callback) {
   });
 }
 
+
 function getInfoSession(option, callback) {
   var url = "/v2/resources/infosessions.json" + "?key=" + key;
   sendReq(baseUrl, url, function (response) {
@@ -292,6 +299,46 @@ function getCourseInfo(subject, num, callback) {
   });
 }
 
+function getTutors(subj, num, callback) {
+  var url = "/v2/resources/tutors.json?key=" + key;
+  var responseStr ;
+  var found = 0;  //indicator variable. 0 == not found, 1 == found.
+  
+  
+  subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
+  
+
+  
+  sendReq (baseUrl, url, function (response) {
+    if (response.meta.status == 200 && response.data.subject !== "undefined") {
+	  
+	  for (var i = 0; i< response.data.length; i++) {
+	    var response_subject = response.data[i].subject;
+		var response_number = response.data[i].catalog_number;
+		var response_title = response.data[i].title;
+		var response_count = response.data[i].tutors_count;
+		var response_url = response.data[i].contact_url;
+		
+		if (response_subject == subj && response_number == num) {
+		  callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
+            + "\nContact Info: " + response_url ) ;
+			found = 1;
+        }
+      }
+	  
+      if (found == 0) {
+        callback( "No tutors for " + subj  + " " + num + " listed. =(" );
+      }
+        
+    }
+		 
+    else {
+	  callback( "Tutor info is unavailable at the moment... =/" );
+	}
+  } )
+}
+
+
 function sendReq(baseUrl, url, callback) {
   var options = {
     host: baseUrl,
@@ -302,6 +349,7 @@ function sendReq(baseUrl, url, callback) {
       "Content-Type": "application/json"
     }
   };
+  
   var req = http.get(options, function(res) {
 
   // Buffer the body entirely for processing as a whole.
