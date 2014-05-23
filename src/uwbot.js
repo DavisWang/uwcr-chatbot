@@ -274,16 +274,21 @@ function getCourseInfo(subject, num, callback) {
   var url = "/v2/courses/" + subject + "/" + num + ".json" + "?key=" + key;
   var responseStr;
   var termsOfferedStr = "";
+  var descriptionStr, prereqStr, antireqStr;
   sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200) {
       for (var i = 0; i < response.data.terms_offered.length; i++) {
         termsOfferedStr += response.data.terms_offered[i] + " ";
       }
+      prereqStr = (response.data.prerequisites !== null) ? response.data.prerequisites : "None";
+      antireqStr = (response.data.antirequisites !== null) ? response.data.antirequisites : "None";
+      descriptionStr = (response.data.description !== null) ? response.data.description : "No description available for " + subject + num;
+      termsOfferedStr = (termsOfferedStr !== "") ? termsOfferedStr : "None";
       responseStr = "<b>" + response.data.title + "</b> \n"
-                 +  response.data.description + "\n" 
-                 +  "prereqs: " + response.data.prerequisites + "\n"
-                 +  "antireqs: " + response.data.antirequisites + "\n"
-                 +  "terms offered: " + termsOfferedStr;
+                  + descriptionStr + "\n" 
+                  + "Prereqs: " + prereqStr + "\n"
+                  + "Antireqs: " + antireqStr + "\n"
+                  + "Terms offered: " + termsOfferedStr;
       callback(responseStr);
     }
     else {
