@@ -281,7 +281,7 @@ function getInfoSession(option, callback) {
 }
 
 function getCourseInfo(subject, num, callback) {
-  var url = "/cs/courses/" + subject + "/" + num + ".json" + "?key=" + key;
+  var url = "/v2/courses/" + subject + "/" + num + ".json" + "?key=" + key;
   var responseStr;
   var termsOfferedStr = "";
   var descriptionStr, prereqStr, antireqStr;
