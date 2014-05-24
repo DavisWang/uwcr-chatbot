@@ -9,6 +9,7 @@ function process (command, callback) {
    * weather
    * holiday
    * exam
+   * tutors
    * help
    * disclaimer
    **/
@@ -74,7 +75,16 @@ function process (command, callback) {
         break;
       case "courseinfo":
         if(args.length == 4) {
-          getCourseInfo(args[2], args[3], function (data) {
+          getCourseInfo(args[2], args[3], function (data) { 
+            callback(data);
+          });
+        }
+		else {
+          callback(returnHelpString());
+        }
+      case "tutors":
+        if(args.length == 4) {
+          getTutors(args[2], args[3], function (data) { 
             callback(data);
           });
         }
@@ -91,12 +101,13 @@ function process (command, callback) {
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
+            <b>tutors</b> (subject) (course_number): Get a list of tutors for this course, if any <br> \
             <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
             <b>disclaimer</b>: Print a boring disclaimer <br> \
             <b>help</b>: Print this help command <br>");
         break;
       case "disclaimer":
-        callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
+        callback("All information from api.uwaterloo.ca, the author provides no guarantees to its correctness.");
         break;
       default:
         callback(returnHelpString());
@@ -299,6 +310,38 @@ function getCourseInfo(subject, num, callback) {
   });
 }
 
+function getTutors(subj, num, callback) {
+  var url = "/v2/resources/tutors.json?key=" + key;
+  var responseStr ;
+  var found = false;  //indicator variable. 0 == not found, 1 == found.
+  
+  subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
+    
+  sendReq (baseUrl, url, function (response) {
+    if (response.meta.status == 200 && response.data.subject !== "undefined") {
+	  
+	  for (var i = 0; i< response.data.length; i++) {
+	    var response_subject = response.data[i].subject;
+		var response_number = response.data[i].catalog_number;
+		var response_title = response.data[i].title;
+		var response_count = response.data[i].tutors_count;
+		var response_url = response.data[i].contact_url;
+		
+		if (response_subject == subj && response_number == num) {
+		  callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
+            + "\nContact Info: " + "<a href=\"" + response_url + "\"" + " target=\"_blank\">" + response_url + "</a>" ) ;
+          found = true;
+      }}
+	  
+      if (!found) {
+        callback( "No tutors for " + subj  + " " + num + " listed. =(" );
+    }}
+		 
+    else {
+	  callback( "Tutor info is unavailable at the moment... =/" );
+    }});
+}
+
 function sendReq(baseUrl, url, callback) {
   var options = {
     host: baseUrl,
@@ -309,6 +352,7 @@ function sendReq(baseUrl, url, callback) {
       "Content-Type": "application/json"
     }
   };
+  
   var req = http.get(options, function(res) {
 
   // Buffer the body entirely for processing as a whole.
