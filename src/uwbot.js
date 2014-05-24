@@ -9,6 +9,7 @@ function process (command, callback) {
    * weather
    * holiday
    * exam
+   * tutors
    * help
    * disclaimer
    **/
@@ -97,7 +98,8 @@ function process (command, callback) {
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
-            <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+            <b>tutors</b> (subject) (course_number): Get a list of tutors for this course, if any <br> \
+			<b>number</b> (number): Get an 'interesting' fact about the given number <br> \
             <b>disclaimer</b>: Print a boring disclaimer <br> \
             <b>help</b>: Print this help command <br>");
         break;
@@ -311,11 +313,8 @@ function getTutors(subj, num, callback) {
   var responseStr ;
   var found = 0;  //indicator variable. 0 == not found, 1 == found.
   
-  
-  subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
-  
-
-  
+    subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
+    
   sendReq (baseUrl, url, function (response) {
     if (response.meta.status == 200 && response.data.subject !== "undefined") {
 	  
@@ -335,8 +334,7 @@ function getTutors(subj, num, callback) {
 	  
       if (found == 0) {
         callback( "No tutors for " + subj  + " " + num + " listed. =(" );
-      }
-        
+      }        
     }
 		 
     else {
@@ -344,7 +342,6 @@ function getTutors(subj, num, callback) {
 	}
   } )
 }
-
 
 function sendReq(baseUrl, url, callback) {
   var options = {
