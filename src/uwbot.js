@@ -102,7 +102,7 @@ function process (command, callback) {
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
             <b>tutors</b> (subject) (course_number): Get a list of tutors for this course, if any <br> \
-			<b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+<b>number</b> (number): Get an 'interesting' fact about the given number <br> \
             <b>disclaimer</b>: Print a boring disclaimer <br> \
             <b>help</b>: Print this help command <br>");
         break;
@@ -315,7 +315,7 @@ function getTutors(subj, num, callback) {
   var responseStr ;
   var found = false;  //indicator variable. 0 == not found, 1 == found.
   
-    subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
+  subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
     
   sendReq (baseUrl, url, function (response) {
     if (response.meta.status == 200 && response.data.subject !== "undefined") {
@@ -330,7 +330,7 @@ function getTutors(subj, num, callback) {
 		if (response_subject == subj && response_number == num) {
 		  callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
             + "\nContact Info: " + "<a href=\"" + response_url + "\"" + " target=\"_blank\">" + response_url + "</a>" ) ;
-			found = true;
+          found = true;
       }}
 	  
       if (!found) {
