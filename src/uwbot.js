@@ -79,6 +79,9 @@ function process (command, callback) {
             callback(data);
           });
         }
+		else {
+          callback(returnHelpString());
+        }
       case "tutors":
         if(args.length == 4) {
           getTutors(args[2], args[3], function (data) { 
@@ -104,7 +107,7 @@ function process (command, callback) {
             <b>help</b>: Print this help command <br>");
         break;
       case "disclaimer":
-        callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
+        callback("All information from api.uwaterloo.ca, the author provides no guarantees to its correctness.");
         break;
       default:
         callback(returnHelpString());
@@ -310,7 +313,7 @@ function getCourseInfo(subject, num, callback) {
 function getTutors(subj, num, callback) {
   var url = "/v2/resources/tutors.json?key=" + key;
   var responseStr ;
-  var found = 0;  //indicator variable. 0 == not found, 1 == found.
+  var found = false;  //indicator variable. 0 == not found, 1 == found.
   
     subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
     
@@ -326,20 +329,17 @@ function getTutors(subj, num, callback) {
 		
 		if (response_subject == subj && response_number == num) {
 		  callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
-            + "\nContact Info: " + response_url ) ;
-			found = 1;
-        }
-      }
+            + "\nContact Info: " + "<a href=\"" + response_url + "\"" + " target=\"_blank\">" + response_url + "</a>" ) ;
+			found = true;
+      }}
 	  
-      if (found == 0) {
+      if (!found) {
         callback( "No tutors for " + subj  + " " + num + " listed. =(" );
-      }        
-    }
+    }}
 		 
     else {
 	  callback( "Tutor info is unavailable at the moment... =/" );
-	}
-  } )
+    }});
 }
 
 function sendReq(baseUrl, url, callback) {
