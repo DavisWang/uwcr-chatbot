@@ -102,7 +102,7 @@ function process (command, callback) {
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
             <b>tutors</b> (subject) (course_number): Get a list of tutors for this course, if any <br> \
-<b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+            <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
             <b>disclaimer</b>: Print a boring disclaimer <br> \
             <b>help</b>: Print this help command <br>");
         break;
