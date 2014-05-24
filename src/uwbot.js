@@ -79,7 +79,7 @@ function process (command, callback) {
             callback(data);
           });
         }
-		else {
+        else {
           callback(returnHelpString());
         }
       case "tutors":
@@ -312,34 +312,35 @@ function getCourseInfo(subject, num, callback) {
 
 function getTutors(subj, num, callback) {
   var url = "/v2/resources/tutors.json?key=" + key;
-  var responseStr ;
+  var responseStr;
   var found = false;  //indicator variable. 0 == not found, 1 == found.
   
   subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
     
-  sendReq (baseUrl, url, function (response) {
+  sendReq(baseUrl, url, function (response) {
     if (response.meta.status == 200 && response.data.subject !== "undefined") {
-	  
-	  for (var i = 0; i< response.data.length; i++) {
-	    var response_subject = response.data[i].subject;
-		var response_number = response.data[i].catalog_number;
-		var response_title = response.data[i].title;
-		var response_count = response.data[i].tutors_count;
-		var response_url = response.data[i].contact_url;
-		
-		if (response_subject == subj && response_number == num) {
-		  callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
-            + "\nContact Info: " + "<a href=\"" + response_url + "\"" + " target=\"_blank\">" + response_url + "</a>" ) ;
+      for (var i = 0 ; i < response.data.length ; i++) {
+        var response_subject = response.data[i].subject;
+        var response_number = response.data[i].catalog_number;
+        var response_title = response.data[i].title;
+        var response_count = response.data[i].tutors_count;
+        var response_url = response.data[i].contact_url;
+
+        if (response_subject == subj && response_number == num) {
+          callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
+            + "\nContact Info: " + "<a href=\"" + response_url + "\"" + " target=\"_blank\">" + response_url + "</a>");
           found = true;
-      }}
-	  
+        }
+      }
+
       if (!found) {
-        callback( "No tutors for " + subj  + " " + num + " listed. =(" );
-    }}
-		 
+        callback("No tutors for " + subj  + " " + num + " listed. =(");
+      }
+    }
     else {
-	  callback( "Tutor info is unavailable at the moment... =/" );
-    }});
+      callback("Tutor info is unavailable at the moment... =/");
+    }
+  });
 }
 
 function sendReq(baseUrl, url, callback) {
