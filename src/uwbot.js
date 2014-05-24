@@ -208,7 +208,6 @@ function getWeather(callback) {
   });
 }
 
-
 function getInfoSession(option, callback) {
   var url = "/v2/resources/infosessions.json" + "?key=" + key;
   sendReq(baseUrl, url, function (response) {
