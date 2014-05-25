@@ -8,6 +8,7 @@ function process (command, callback) {
    * Commands accepted:
    * weather
    * holiday
+   * food
    * exam
    * tutors
    * help
@@ -42,6 +43,16 @@ function process (command, callback) {
       case "holiday":
         if(args.length == 2) {
           getNextHoliday(function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
+      case "food":
+        if(args.length == 2) {
+          getFood(function (data) {
             callback(data);
           });
         }
@@ -97,6 +108,7 @@ function process (command, callback) {
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
             <b>weather</b>: Get the current weather in Waterloo <br> \
+            <b>food</b>: Get a list of currently open Food Services locations <br> \
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
@@ -207,6 +219,29 @@ function getWeather(callback) {
     }
     else {
       callback("Cannot get weather info for Waterloo...");
+    }
+  });
+}
+
+function getFood(callback) {
+  var url ="/v2/foodservices/locations.json" + "?key=" + key;
+  sendReq(baseUrl, url, function (response) {
+    if (response.meta.status == 200) {
+      var responseStr = "";
+      for (var i = 0; i < response.data.length; i++) {
+        if (response.data[i].is_open_now == true) {
+          responseStr += "\n" + response.data[i].outlet_name;
+        }
+      }
+      if (responseStr.length == 0) {
+        callback("There are no Food Services locations open right now");
+      }
+      else {
+        callback("Open right now:" + responseStr);
+      }
+    }
+    else {
+      callback("Food Services data is not available at the moment...");
     }
   });
 }
