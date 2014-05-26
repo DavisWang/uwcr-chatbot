@@ -30,6 +30,16 @@ function process (command, callback) {
     }
 
     switch(args[1]) {
+      case "course":
+        if (args.length == 4) {
+          getCourseSchedule(args[2], args[3], function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
       case "weather":
         if(args.length == 2) {
           getWeather(function (data) {
@@ -107,6 +117,7 @@ function process (command, callback) {
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
+            <b>course</b>: (subject) (course_number) Get the times that a course is offered.<br> \
             <b>weather</b>: Get the current weather in Waterloo <br> \
             <b>food</b>: Get a list of currently open Food Services locations <br> \
             <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
@@ -375,6 +386,55 @@ function getTutors(subj, num, callback) {
     else {
       callback("Tutor info is unavailable at the moment... =/");
     }
+  });
+}
+
+function convertToDays(days) {
+  switch (days) {
+    case "M":
+      return "Mondays"
+    case "T":
+      return "Tuesdays"
+    case "W":
+      return "Wednesdays"
+    case "Th":
+      return "Thursdays"
+    case "F":
+      return "Fridays"
+    case "MW":
+      return "Mondays and Wednesdays";
+    case "WF":
+      return "Wednesdays and Fridays";
+    case "MWF":
+      return "Mondays, Wednesdays and Fridays";
+    case "TTh":
+      return "Tuesdays and Thursdays";
+    default:
+      return days;
+  }
+}
+
+function getCourseSchedule(subj, num, callback) {
+  var url = "/v2/courses/" + subj + "/" + num + "/schedule.json" + "?key=" + key;
+  var responseStr;
+  sendReq(baseUrl, url, function (response) {
+    if(response.meta.status == 200) {
+      responseStr = response.data[0].subject + " " + response.data[0].catalog_number + 
+        " is offered during the following times: <br>";
+      courses = response.data[0]["classes"];
+      var responseList = "";
+
+      for (var i = 0 ; i < courses.length ; i++) {
+        responseStr += "   " + courses[i].date.start_time + " to " + courses[i].date.end_time + 
+          " on " + convertToDays(courses[i].date.weekdays) + "<br>";
+      }
+
+    }
+    else {
+      responseStr = "Cannot find course schedule for '" + subj + num + 
+        "'! Course schedule is not up or no such course exists ;)";
+    }
+    callback(responseStr);
   });
 }
 
