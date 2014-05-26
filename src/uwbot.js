@@ -305,13 +305,9 @@ function getCourseSchedule(subj, num, callback) {
       var responseList = "";
 
       for (var i=0; i < courses.length; i++) {
-        responseList += "<li>" + courses[i].date.start_time + " to " + courses[i].date.end_time + 
-          " on " + convertToDays(courses[i].date.weekdays) + "</li>";
+        responseStr += "   " + courses[i].date.start_time + " to " + courses[i].date.end_time + 
+          " on " + convertToDays(courses[i].date.weekdays) + "<br>";
 
-      }
-
-      if (courses.length >= 1) {
-        responseStr += "<ul>" + responseList + "</ul>";
       }
 
     }
