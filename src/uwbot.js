@@ -103,6 +103,7 @@ function process (command, callback) {
         else {
           callback(returnHelpString());
         }
+        break;
       case "tutors":
         if(args.length == 4) {
           getTutors(args[2], args[3], function (data) { 
@@ -117,15 +118,15 @@ function process (command, callback) {
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
-            <b>course</b>: (subject) (course_number) Get the times that a course is offered.<br> \
-            <b>weather</b>: Get the current weather in Waterloo <br> \
-            <b>food</b>: Get a list of currently open Food Services locations <br> \
-            <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
-            <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>course</b>: [subject] (course_number) Get the schedule of a course in the current term.<br> \
+            <b>courseinfo</b> [subject] (course_number): Get a brief description of the course, prereqs and antireqs <br> \
+            <b>exam</b> [subject] (course_number): Get the exam info for a given subject <br> \
+            <b>tutors</b> [subject] (course_number): Get a list of tutors for this course, if any <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
-            <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
-            <b>tutors</b> (subject) (course_number): Get a list of tutors for this course, if any <br> \
+            <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>food</b>: Get a list of currently open Food Services locations <br> \
             <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+            <b>weather</b>: Get the current weather in Waterloo <br> \
             <b>disclaimer</b>: Print a boring disclaimer <br> \
             <b>help</b>: Print this help command <br>");
         break;
@@ -392,15 +393,15 @@ function getTutors(subj, num, callback) {
 function convertToDays(days) {
   switch (days) {
     case "M":
-      return "Mondays"
+      return "Mondays";
     case "T":
-      return "Tuesdays"
+      return "Tuesdays";
     case "W":
-      return "Wednesdays"
+      return "Wednesdays";
     case "Th":
-      return "Thursdays"
+      return "Thursdays";
     case "F":
-      return "Fridays"
+      return "Fridays";
     case "MW":
       return "Mondays and Wednesdays";
     case "WF":
