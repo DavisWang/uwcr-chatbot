@@ -6,10 +6,14 @@ function process (command, callback) {
   //command format should be "@uwbot <commands> <parameters>"
   /**
    * Commands accepted:
+   * course
    * weather
    * holiday
    * food
    * exam
+   * number
+   * infosess
+   * courseinfo
    * tutors
    * help
    * disclaimer
@@ -87,7 +91,7 @@ function process (command, callback) {
           })
         }
         break;
-      case "infoses":
+      case "infosess":
         var index = str.indexOf(" ");
         var arg = (index == -1) ? "" : str.substr(index + 1);
         getInfoSession(arg, function (data) {
@@ -122,7 +126,7 @@ function process (command, callback) {
             <b>courseinfo</b> [subject] (course_number): Get a brief description of the course, prereqs and antireqs <br> \
             <b>exam</b> [subject] (course_number): Get the exam info for a given subject <br> \
             <b>tutors</b> [subject] (course_number): Get a list of tutors for this course, if any <br> \
-            <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
+            <b>infosess</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
             <b>food</b>: Get a list of currently open Food Services locations <br> \
             <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
