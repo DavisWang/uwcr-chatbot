@@ -8,7 +8,9 @@ function process (command, callback) {
    * Commands accepted:
    * weather
    * holiday
+   * food
    * exam
+   * tutors
    * help
    * disclaimer
    **/
@@ -28,6 +30,16 @@ function process (command, callback) {
     }
 
     switch(args[1]) {
+      case "course":
+        if (args.length == 4) {
+          getCourseSchedule(args[2], args[3], function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
       case "weather":
         if(args.length == 2) {
           getWeather(function (data) {
@@ -41,6 +53,16 @@ function process (command, callback) {
       case "holiday":
         if(args.length == 2) {
           getNextHoliday(function (data) {
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
+      case "food":
+        if(args.length == 2) {
+          getFood(function (data) {
             callback(data);
           });
         }
@@ -74,7 +96,17 @@ function process (command, callback) {
         break;
       case "courseinfo":
         if(args.length == 4) {
-          getCourseInfo(args[2], args[3], function (data) {
+          getCourseInfo(args[2], args[3], function (data) { 
+            callback(data);
+          });
+        }
+        else {
+          callback(returnHelpString());
+        }
+        break;
+      case "tutors":
+        if(args.length == 4) {
+          getTutors(args[2], args[3], function (data) { 
             callback(data);
           });
         }
@@ -86,17 +118,20 @@ function process (command, callback) {
       case "help":
         callback("Address bot with <b>@uwbot</b> or <b>@bot</b> (command) (options) <br> \
           <b>UWBot commands:</b> <br> \
-            <b>weather</b>: Get the current weather in Waterloo <br> \
-            <b>exam</b> (subject) (course_number): Get the exam info for a given subject <br> \
-            <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>course</b>: [subject] (course_number) Get the schedule of a course in the current term.<br> \
+            <b>courseinfo</b> [subject] (course_number): Get a brief description of the course, prereqs and antireqs <br> \
+            <b>exam</b> [subject] (course_number): Get the exam info for a given subject <br> \
+            <b>tutors</b> [subject] (course_number): Get a list of tutors for this course, if any <br> \
             <b>infoses</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
-            <b>courseinfo</b> (subject) (course_number): Get a brief description of the course, prereq and antireq <br> \
+            <b>holiday</b>: Get the date of the next holiday! <br> \
+            <b>food</b>: Get a list of currently open Food Services locations <br> \
             <b>number</b> (number): Get an 'interesting' fact about the given number <br> \
+            <b>weather</b>: Get the current weather in Waterloo <br> \
             <b>disclaimer</b>: Print a boring disclaimer <br> \
             <b>help</b>: Print this help command <br>");
         break;
       case "disclaimer":
-        callback("All information from api.uwaterloo.ca, the author provides no guarentees to its correctness.");
+        callback("All information from api.uwaterloo.ca, the author provides no guarantees to its correctness.");
         break;
       default:
         callback(returnHelpString());
@@ -200,6 +235,29 @@ function getWeather(callback) {
   });
 }
 
+function getFood(callback) {
+  var url ="/v2/foodservices/locations.json" + "?key=" + key;
+  sendReq(baseUrl, url, function (response) {
+    if (response.meta.status == 200) {
+      var responseStr = "";
+      for (var i = 0; i < response.data.length; i++) {
+        if (response.data[i].is_open_now == true) {
+          responseStr += "\n" + response.data[i].outlet_name;
+        }
+      }
+      if (responseStr.length == 0) {
+        callback("There are no Food Services locations open right now");
+      }
+      else {
+        callback("Open right now:" + responseStr);
+      }
+    }
+    else {
+      callback("Food Services data is not available at the moment...");
+    }
+  });
+}
+
 function getInfoSession(option, callback) {
   var url = "/v2/resources/infosessions.json" + "?key=" + key;
   sendReq(baseUrl, url, function (response) {
@@ -299,6 +357,88 @@ function getCourseInfo(subject, num, callback) {
   });
 }
 
+function getTutors(subj, num, callback) {
+  var url = "/v2/resources/tutors.json?key=" + key;
+  var responseStr;
+  var found = false;  //indicator variable. 0 == not found, 1 == found.
+  
+  subj = subj.toUpperCase(); //UW API only uses upper case letters for subjects
+    
+  sendReq(baseUrl, url, function (response) {
+    if (response.meta.status == 200 && response.data.subject !== "undefined") {
+      for (var i = 0 ; i < response.data.length ; i++) {
+        var response_subject = response.data[i].subject;
+        var response_number = response.data[i].catalog_number;
+        var response_title = response.data[i].title;
+        var response_count = response.data[i].tutors_count;
+        var response_url = response.data[i].contact_url;
+
+        if (response_subject == subj && response_number == num) {
+          callback("Tutors for " + subj + " " + num + " - " + response_title + ":\nNumber of Tutors: " + response_count
+            + "\nContact Info: " + "<a href=\"" + response_url + "\"" + " target=\"_blank\">" + response_url + "</a>");
+          found = true;
+        }
+      }
+
+      if (!found) {
+        callback("No tutors for " + subj  + " " + num + " listed. =(");
+      }
+    }
+    else {
+      callback("Tutor info is unavailable at the moment... =/");
+    }
+  });
+}
+
+function convertToDays(days) {
+  switch (days) {
+    case "M":
+      return "Mondays";
+    case "T":
+      return "Tuesdays";
+    case "W":
+      return "Wednesdays";
+    case "Th":
+      return "Thursdays";
+    case "F":
+      return "Fridays";
+    case "MW":
+      return "Mondays and Wednesdays";
+    case "WF":
+      return "Wednesdays and Fridays";
+    case "MWF":
+      return "Mondays, Wednesdays and Fridays";
+    case "TTh":
+      return "Tuesdays and Thursdays";
+    default:
+      return days;
+  }
+}
+
+function getCourseSchedule(subj, num, callback) {
+  var url = "/v2/courses/" + subj + "/" + num + "/schedule.json" + "?key=" + key;
+  var responseStr;
+  sendReq(baseUrl, url, function (response) {
+    if(response.meta.status == 200) {
+      responseStr = response.data[0].subject + " " + response.data[0].catalog_number + 
+        " is offered during the following times: <br>";
+      courses = response.data[0]["classes"];
+      var responseList = "";
+
+      for (var i = 0 ; i < courses.length ; i++) {
+        responseStr += "   " + courses[i].date.start_time + " to " + courses[i].date.end_time + 
+          " on " + convertToDays(courses[i].date.weekdays) + "<br>";
+      }
+
+    }
+    else {
+      responseStr = "Cannot find course schedule for '" + subj + num + 
+        "'! Course schedule is not up or no such course exists ;)";
+    }
+    callback(responseStr);
+  });
+}
+
 function sendReq(baseUrl, url, callback) {
   var options = {
     host: baseUrl,
@@ -309,6 +449,7 @@ function sendReq(baseUrl, url, callback) {
       "Content-Type": "application/json"
     }
   };
+  
   var req = http.get(options, function(res) {
 
   // Buffer the body entirely for processing as a whole.
