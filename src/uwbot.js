@@ -84,6 +84,17 @@ function process (command, callback) {
           callback(returnHelpString());
         }
         break;
+     case "news":
+        if (args.length == 2){
+          getNews(function (data) {
+            callback(data);
+          });
+          break;
+        }
+        else{
+          callback(returnHelpString());
+        }
+        break;
       case "number":
         if(args.length == 3 && parseInt(args[2]) == args[2]) {
           getNumberTrivia(args[2], function (data) {
@@ -236,6 +247,26 @@ function getWeather(callback) {
     else {
       callback("Cannot get weather info for Waterloo...");
     }
+  });
+}
+
+function getNews(callback) {
+  var url = "/v2/news.json" + "?key=" + key;
+  var responseStr;
+  sendReq(baseUrl, url, function (response) {
+    if(response.meta.status == 200) {
+      responseStr = "Top 5 News"+"\n";
+	  for (var i=0;i<3;i++){
+		responseStr+="Site:"+response.data[i].site + "\n \
+		Last Update:"+response.data[i].updated + "\n \
+		Link:" + "<a href=\""+response.data[i].link+"\">"+response.data[i].title+"</a>"+ "\n";
+		responseStr+="\n";
+	  }
+    }
+    else {
+      responseStr = "Error in finding news";
+    }
+    callback(responseStr);
   });
 }
 
