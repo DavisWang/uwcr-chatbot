@@ -16,3 +16,5 @@ Leo Liu <leoliuzx@hotmail.com>
 Hashim Mir <hashim.mir123@gmail.com>
 
 Tahir Zaman <zamanmtahir@gmail.com>
+
+Kevin He <kevin@kevinhe.ca>
