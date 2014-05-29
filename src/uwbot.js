@@ -11,6 +11,7 @@ function process (command, callback) {
    * holiday
    * food
    * exam
+   * news
    * number
    * infosess
    * courseinfo
@@ -85,13 +86,12 @@ function process (command, callback) {
         }
         break;
      case "news":
-        if (args.length == 2){
+        if(args.length == 2) {
           getNews(function (data) {
             callback(data);
           });
-          break;
         }
-        else{
+        else {
           callback(returnHelpString());
         }
         break;
@@ -99,7 +99,7 @@ function process (command, callback) {
         if(args.length == 3 && parseInt(args[2]) == args[2]) {
           getNumberTrivia(args[2], function (data) {
             callback(data);
-          })
+          });
         }
         break;
       case "infosess":
@@ -136,6 +136,7 @@ function process (command, callback) {
             <b>course</b>: [subject] (course_number) Get the schedule of a course in the current term.<br> \
             <b>courseinfo</b> [subject] (course_number): Get a brief description of the course, prereqs and antireqs <br> \
             <b>exam</b> [subject] (course_number): Get the exam info for a given subject <br> \
+            <b>news</b>: Get 3 of the most recent UW news <br> \
             <b>tutors</b> [subject] (course_number): Get a list of tutors for this course, if any <br> \
             <b>infosess</b> (\"today\"/company_name): Get today's employer's info sessions or a specific company's info sessions <br> \
             <b>holiday</b>: Get the date of the next holiday! <br> \
@@ -255,16 +256,15 @@ function getNews(callback) {
   var responseStr;
   sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200) {
-      responseStr = "Top 5 News"+"\n";
-	  for (var i=0;i<3;i++){
-		responseStr+="Site:"+response.data[i].site + "\n \
-		Last Update:"+response.data[i].updated + "\n \
-		Link:" + "<a href=\""+response.data[i].link+"\">"+response.data[i].title+"</a>"+ "\n";
-		responseStr+="\n";
-	  }
+      responseStr = "3 Most Recent UW News:" + "\n";
+      for (var i = 0; i < 3; i++) {
+        responseStr += "Site:" + response.data[i].site + "\n" +
+        "Last Update:" + response.data[i].updated + "\n" +
+        "Link:" + "<a href=\"" + response.data[i].link+"\">" + response.data[i].title + "</a>" + "\n\n";
+      }
     }
     else {
-      responseStr = "Error in finding news";
+      responseStr = "News is not available at the moment...";
     }
     callback(responseStr);
   });
