@@ -221,12 +221,12 @@ function getExamSchedule(subj, num, callback) {
   sendReq(baseUrl, url, function (response) {
     if(response.meta.status == 200 && typeof response.data.course !== "undefined") {
       responseStr = "Exam Info for " + response.data.course + ": <br>";
-      for(section in response.data.sections) {
-        responseStr += "Section: " + response.data.section.section + "<br> \
-        Date: " + response.data.section.date + "<br> \
-        Start Time: " + response.data.section.start_time + "<br> \
-        End Time: " + response.data.section.end_time + "<br> \
-        Location: " + response.data.section.location + "<br> \
+      for(var i = 0 ; i < response.data.sections.length ; i++) {
+        responseStr += "Section: " + response.data.sections[i].section + "<br> \
+        Date: " + response.data.sections[i].date + "<br> \
+        Start Time: " + response.data.sections[i].start_time + "<br> \
+        End Time: " + response.data.sections[i].end_time + "<br> \
+        Location: " + response.data.sections[i].location + "<br> \
         ";
       }
     }
