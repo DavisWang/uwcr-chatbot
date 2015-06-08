@@ -474,6 +474,7 @@ function getCourseSchedule(subj, num, callback) {
   });
 }
 
+//from http://stackoverflow.com/a/9578403/1267855
 function sendReq(baseUrl, url, callback) {
   var options = {
     host: baseUrl,
